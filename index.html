@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>STOCKOFF29 改良版</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2b7cff">
+
+<style>
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    margin: 20px;
+    background: #f9fafc;
+    color: #333;
+  }
+  h1 { text-align: center; }
+  .form-area {
+    max-width: 600px; margin: 0 auto; padding: 15px;
+    border: 1px solid #ccc; border-radius: 10px; background: #fff;
+  }
+  .form-area label {
+    display: block; margin-top: 10px; font-weight: bold;
+  }
+  .form-area input {
+    width: 100%; padding: 8px; margin-top: 4px;
+    border: 1px solid #aaa; border-radius: 6px;
+  }
+  .form-area button {
+    margin-top: 15px; padding: 10px 20px;
+    background: #2b7cff; color: #fff;
+    border: none; border-radius: 8px; cursor: pointer;
+  }
+  .form-area button:hover { background: #1f5fcc; }
+  #resultArea {
+    max-width: 800px; margin: 20px auto; padding: 15px;
+    border: 1px solid #ddd; border-radius: 10px; background: #fff;
+  }
+  table {
+    border-collapse: collapse; width: 100%; margin-top: 10px;
+  }
+  th, td {
+    border: 1px solid #666; padding: 8px; text-align: center;
+  }
+  th { background: #f0f4f9; }
+  .law {
+    font-size: small; color: blue; line-height: 1.6; margin-top: 15px;
+  }
+</style>
+</head>
+
+<body>
+<h1>Option 計算書 STOCKOFF29 改良版</h1>
+
+<div class="form-area">
+  <label>B（政府証券）</label>
+  <input type="number" id="inputB" step="any">
+  <label>O（オプションの評価）</label>
+  <input type="number" id="inputO" step="any">
+  <label>T（調整パラメーター）</label>
+  <input type="number" id="inputT" step="any">
+  <label>K（銘柄の再評価）</label>
+  <input type="number" id="inputK" step="any">
+  <button onclick="calcStockoff29()">計算する</button>
+</div>
+
+<div id="resultArea"></div>
+
+<h2>関連法規</h2>
+<div class="law">
+  <p>第1条 銘柄と国債の交換を不動産の流動性を高めるためにオプションを通して実行することができる</p>
+  <p>第2条 仲介者はオプションの価格を計算することができる</p>
+  <p>第3条 仲介者はファンド・ブローカーとしてオプションの中から仲介報酬を請求する権利がある</p>
+  <p>第4条 この取引で仲介に入るものは融資の斡旋をすることはできない</p>
+  <p>第5条 この取引の内容を知りながら融資の斡旋によって銀行が利得を得た場合、損害賠償の責任を負う</p>
+</div>
+
+<script>
+function calcStockoff29(){
+  var B = parseFloat(inputB.value) || 0;
+  var O = parseFloat(inputO.value) || 0;
+  var T = parseFloat(inputT.value) || 0;
+  var K = parseFloat(inputK.value) || 1;
+  var S = B - O*T;
+  var denom = 0.95*K - 1;
+  var S2 = Math.abs(denom)<1e-12 ? "計算不可" : Math.round((O/denom)*10000)/10000;
+
+  resultArea.innerHTML =
+    `<h2>入力・出力一覧表</h2>
+     <table>
+     <tr><th>項目</th><th>値</th></tr>
+     <tr><td>B</td><td>${B}</td></tr>
+     <tr><td>O</td><td>${O}</td></tr>
+     <tr><td>T</td><td>${T}</td></tr>
+     <tr><td>K</td><td>${K}</td></tr>
+     <tr><td>S</td><td>${S}</td></tr>
+     <tr><td>S2</td><td>${S2}</td></tr>
+     </table>`;
+}
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+</body>
+</html>
